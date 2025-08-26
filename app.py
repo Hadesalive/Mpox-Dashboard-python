@@ -10,13 +10,13 @@ from sklearn.ensemble import IsolationForest
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from utils.data import load_data, filter_data, make_filter_note
 from utils.style import apply_base_theme, COLOR_SEQ
-from views.overview import overview_tab
 from views.geography import geography_tab
 from views.vaccination import vaccination_tab
 from views.workforce import workforce_tab
 from views.deep_dives import deep_dives_tab
 from views.insights_view import insights_tab
 from views.recommendations import recommendations_tab
+from views.findings import findings_tab
 
 
 # -----------------------------
@@ -107,9 +107,9 @@ def main():
     filtered = filter_data(df, date_range, countries, clades, notes)
     context_note = make_filter_note(date_range, countries, clades, notes)
 
-    tabs = st.tabs(["Overview", "Geography", "Vaccination", "Workforce", "Deep Dives", "Insights", "Recommendations"])
+    tabs = st.tabs(["Findings", "Geography", "Vaccination", "Workforce", "Deep Dives", "Insights", "Recommendations"])
     with tabs[0]:
-        overview_tab(filtered, context_note)
+        findings_tab(filtered, context_note)
     with tabs[1]:
         geography_tab(filtered, context_note)
     with tabs[2]:
