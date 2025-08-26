@@ -31,7 +31,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
         )
         fig.update_layout(height=460, showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
-        st.caption(f"Higher uptake at similar allocation suggests stronger in-country utilization. {context_note}")
+        st.caption(f"ℹ️ At similar allocation, higher uptake indicates stronger in-country utilization. {context_note}")
     else:
         st.info("Need allocation, deployment, administered columns for this view.")
 
@@ -60,7 +60,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
         )
         fig_hm.update_layout(height=520)
         st.plotly_chart(fig_hm, use_container_width=True)
-        st.caption(f"Where stock is stuck: central vs last-mile in-country. {context_note}")
+        st.caption(f"ℹ️ Undeployed stock suggests central bottlenecks; in-country not administered suggests last-mile issues. {context_note}")
     else:
         st.info("Need allocation, deployment, administered columns for this view.")
 
@@ -102,7 +102,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
             )
             fig_bubble.update_layout(height=460, showlegend=False)
             st.plotly_chart(fig_bubble, use_container_width=True)
-            st.caption(f"More surveillance per case generally aligns with lower CFR. {context_note}")
+            st.caption(f"ℹ️ More surveillance per case generally aligns with lower CFR. {context_note}")
         else:
             st.info("Showing surveillance vs CFR requires cases plus at least one of surveillance sites or labs, and deaths or CFR.")
 
@@ -150,7 +150,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
                 )
                 fig_hm2.update_layout(height=520)
                 st.plotly_chart(fig_hm2, use_container_width=True)
-                st.caption(f"Per-case workforce and surveillance ratios by country. {context_note}")
+                st.caption(f"ℹ️ Per-case workforce and surveillance ratios by country. {context_note}")
             else:
                 st.info("No workforce/surveillance metrics available to compute ratios.")
         else:
@@ -167,7 +167,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
             fig_pie = px.pie(clade_agg, names="clade", values="total_cases", title="Proportion of Total Cases by Clade")
             fig_pie.update_layout(height=420)
             st.plotly_chart(fig_pie, use_container_width=True)
-            st.caption(f"Distribution of total cases by clade within the selection. {context_note}")
+            st.caption(f"ℹ️ Distribution of total cases by clade within the selection. {context_note}")
 
         if {"report_date", "weekly_new_cases"}.issubset(df.columns) and not df["report_date"].isna().all():
             trend = df.dropna(subset=["report_date"]).copy()
@@ -176,7 +176,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
             fig_trend = px.line(trend, x="report_date", y="weekly_new_cases", color="clade", title="Weekly Cases by Clade")
             fig_trend.update_layout(height=420)
             st.plotly_chart(fig_trend, use_container_width=True)
-            st.caption(f"Weekly cases split by clade over time. {context_note}")
+            st.caption(f"ℹ️ Weekly cases split by clade over time. {context_note}")
     else:
         st.info("No clade information available in data.")
 
@@ -211,7 +211,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
                                   labels={"confirmed_cases": "Confirmed"})
                 fig_unk.update_layout(height=460)
                 st.plotly_chart(fig_unk, use_container_width=True)
-                st.caption(f"Countries with unknown clade reporting; improves with better genomics. {context_note}")
+                st.caption(f"ℹ️ Countries with unknown clade reporting; improves with better genomics. {context_note}")
             else:
                 st.info("No unknown clade records.")
         else:
@@ -230,7 +230,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
             fig_lines = px.line(vac_m, x="country", y="doses", color="stage", markers=True, color_discrete_sequence=COLOR_SEQ)
             fig_lines.update_layout(xaxis_tickangle=-30, height=420)
             st.plotly_chart(fig_lines, use_container_width=True)
-            st.caption(f"Deployed vs administered doses by country. {context_note}")
+            st.caption(f"ℹ️ Compare deployed vs administered to spot last-mile bottlenecks. {context_note}")
         else:
             st.info("Need deployed and administered columns.")
 
@@ -249,7 +249,7 @@ def deep_dives_tab(df: pd.DataFrame, context_note: str):
                                  color_discrete_sequence=["#06B6D4"])
             fig_eff.update_layout(height=420)
             st.plotly_chart(fig_eff, use_container_width=True)
-            st.caption(f"Allocation per 1,000 cases vs burden; bubble ~ administered. {context_note}")
+            st.caption(f"ℹ️ Allocation per 1,000 cases vs burden; bubble size ≈ administered doses. {context_note}")
         else:
             st.info("Need allocated and confirmed cases columns.")
 

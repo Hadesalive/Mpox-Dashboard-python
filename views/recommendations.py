@@ -67,6 +67,17 @@ def _recommendations_for_row(r: pd.Series) -> list:
 
 
 def _assign_personas(summary: pd.DataFrame) -> pd.DataFrame:
+    # Handle edge cases
+    if summary is None or len(summary) == 0:
+        out = (summary or pd.DataFrame()).copy()
+        out["persona_id"] = 0
+        out["persona_name"] = "Balanced"
+        return out
+    if len(summary) < 2:
+        out = summary.copy()
+        out["persona_id"] = 0
+        out["persona_name"] = "Balanced"
+        return out
     # Features for clustering (handle missing with 0s where appropriate)
     feat_cols = [
         "total_cases", "cfr_percent", "deployed_per_case", "surveillance_per_case",
@@ -79,10 +90,9 @@ def _assign_personas(summary: pd.DataFrame) -> pd.DataFrame:
     X = use[feat_cols].fillna(0.0).values
     # Scale and cluster into up to 4 personas (fallback to smaller if few countries)
     n_countries = len(use)
-    if n_countries < 4:
-        n_clusters = max(2, n_countries)
-    else:
-        n_clusters = 4
+    n_clusters = min(4, n_countries)
+    if n_clusters < 2:
+        n_clusters = 2
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X)
     km = KMeans(n_clusters=n_clusters, n_init=10, random_state=42)

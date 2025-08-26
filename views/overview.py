@@ -39,6 +39,7 @@ def overview_tab(df: pd.DataFrame, context_note: str):
         kpi_card("Vaccinations", roll.get("vaccinations_administered", np.nan))
     with col5:
         kpi_card("Latest Coverage %", roll.get("latest_coverage", np.nan))
+    st.caption("ℹ️ CFR: deaths/confirmed ×100. Coverage: latest reported vaccine coverage. Values reflect current filters.")
 
     st.markdown("---")
     left, right = st.columns((2, 1), gap="large")

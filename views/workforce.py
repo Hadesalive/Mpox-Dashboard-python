@@ -23,13 +23,13 @@ def workforce_tab(df: pd.DataFrame, context_note: str):
                      title="Deployed CHWs per Case")
         fig.update_layout(xaxis_tickangle=-30, height=460)
         st.plotly_chart(fig, use_container_width=True)
-        st.caption(f"Deployed CHWs normalized per case. {context_note}")
+        st.caption(f"ℹ️ Deployed CHWs per confirmed case; higher is better. {context_note}")
     with cols[1]:
         fig2 = px.bar(agg.sort_values("trained_per_case"), x="country", y="trained_per_case",
                       title="Trained CHWs per Case")
         fig2.update_layout(xaxis_tickangle=-30, height=460)
         st.plotly_chart(fig2, use_container_width=True)
-        st.caption(f"Trained CHWs normalized per case. {context_note}")
+        st.caption(f"ℹ️ Trained CHWs per confirmed case; higher is better. {context_note}")
 
     # Data quality hints
     dq = []

@@ -94,6 +94,9 @@ def insights_tab(df: pd.DataFrame):
 
     country_latest["priority_score"] = country_latest.apply(score_row, axis=1)
     top = country_latest.sort_values("priority_score", ascending=False)
+    if top.empty:
+        st.info("No data available to compute insights for the current filters.")
+        return
 
     st.subheader("Priority ranking (rule-based)")
     fig_score = px.bar(top.head(10), x="country", y="priority_score", color="country", color_discrete_sequence=COLOR_SEQ,
@@ -120,8 +123,13 @@ def insights_tab(df: pd.DataFrame):
         comp["trend_growth"] = (max(0.0, min(g, 1.0)) * 10) if pd.notna(g) else 0
         return comp
 
-    sel_country = st.selectbox("Select country", options=top["country"].tolist(), index=0, key="insights_sel_country")
-    sel_row = top[top["country"] == sel_country].iloc[0].to_dict()
+    options = top["country"].tolist()
+    sel_country = st.selectbox("Select country", options=options, index=0 if options else None, key="insights_sel_country")
+    row_df = top[top["country"] == sel_country] if sel_country in options else top
+    if row_df.empty:
+        st.info("No country rows available after filtering.")
+        return
+    sel_row = row_df.iloc[0].to_dict()
     comps = score_components(sel_row)
     comp_df = pd.DataFrame({"component": list(comps.keys()), "value": list(comps.values())})
     fig_comp = px.bar(comp_df, x="component", y="value", title=f"{sel_country}: score contribution by factor",
@@ -139,7 +147,7 @@ def insights_tab(df: pd.DataFrame):
     with colm3:
         st.metric("Uptake %", f"{sel_row.get('uptake_rate_pct', np.nan):.1f}")
         st.metric("4-week growth", f"{sel_row.get('growth4w', 0.0):.2f}")
-    st.caption("CFR: deaths/cases. CHWs/surv per case: higher is better. Allocation per 1,000: vaccine allocation adjusted for burden. Uptake %: administered/allocated.")
+    st.caption("ℹ️ CFR: deaths/cases ×100. CHWs/surv per case: higher is better. Allocation/1,000: doses per 1,000 cases. Uptake %: administered/allocated.")
 
     if enable_anomaly and weekly is not None and not weekly.empty:
         st.markdown("---")

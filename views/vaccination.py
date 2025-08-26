@@ -27,7 +27,7 @@ def vaccination_tab(df: pd.DataFrame, context_note: str):
                  color_discrete_sequence=COLOR_SEQ)
     fig.update_layout(xaxis_tickangle=-30, height=460)
     st.plotly_chart(fig, use_container_width=True)
-    st.caption(f"Allocated → Deployed → Administered doses by country. {context_note}")
+    st.caption(f"ℹ️ Flow shows Allocated → Deployed → Administered doses by country. {context_note}")
 
     st.markdown("---")
     st.subheader("Rates (%)")
@@ -37,7 +37,7 @@ def vaccination_tab(df: pd.DataFrame, context_note: str):
                   title="Deployment, Administration, Uptake Rates")
     fig2.update_layout(height=520)
     st.plotly_chart(fig2, use_container_width=True)
-    st.caption(f"Rates derived from selected countries and dates. {context_note}")
+    st.caption(f"ℹ️ Deployment % = Deployed/Allocated; Administration % = Administered/Deployed; Uptake % = Administered/Allocated. {context_note}")
 
     # Data quality and alerts
     dq_msgs = []
