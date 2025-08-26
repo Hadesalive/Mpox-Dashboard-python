@@ -86,62 +86,89 @@ def build_sidebar(df) -> Tuple[Optional[Tuple[datetime, datetime]], List[str], L
 
 
 def main():
-    st.markdown("<h1>Mpox Africa Dashboard</h1>", unsafe_allow_html=True)
-    st.caption("Interactive insights on outbreak trends, vaccination progress, surveillance, and workforce capacity.")
-
-    # Try multiple paths for deployment compatibility
-    possible_paths = [
-        "mpox_africa_dataset.xlsx",  # Current directory
-        os.path.join(os.path.dirname(__file__), "mpox_africa_dataset.xlsx"),  # Script directory
-        os.path.join(os.getcwd(), "mpox_africa_dataset.xlsx")  # Working directory
-    ]
-    
-    default_data_path = None
-    for path in possible_paths:
-        if os.path.exists(path):
-            default_data_path = path
-            break
-    
-    if default_data_path is None:
-        st.error("Dataset file not found. Please ensure 'mpox_africa_dataset.xlsx' is in the project directory.")
-        return
-
-    st.sidebar.header("Data")
-    uploaded = st.sidebar.file_uploader("Upload Excel (.xlsx) to override", type=["xlsx"], key="data_upload")
-
     try:
-        df = _load_data_cached(default_data_path, uploaded)
-    except FileNotFoundError:
-        st.error("Default dataset not found. Please upload an Excel file using the sidebar.")
-        return
+        st.markdown("<h1>Mpox Africa Dashboard</h1>", unsafe_allow_html=True)
+        st.caption("Interactive insights on outbreak trends, vaccination progress, surveillance, and workforce capacity.")
+
+        # Debug: Show current working directory and available files
+        st.info(f"Current working directory: {os.getcwd()}")
+        try:
+            files = os.listdir(".")
+            st.info(f"Available files: {files}")
+        except Exception as e:
+            st.error(f"Error listing files: {e}")
+
+        # Try multiple paths for deployment compatibility
+        possible_paths = [
+            "mpox_africa_dataset.xlsx",  # Current directory
+            os.path.join(os.path.dirname(__file__), "mpox_africa_dataset.xlsx"),  # Script directory
+            os.path.join(os.getcwd(), "mpox_africa_dataset.xlsx")  # Working directory
+        ]
+        
+        st.info(f"Trying paths: {possible_paths}")
+        
+        default_data_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                default_data_path = path
+                st.success(f"Found dataset at: {path}")
+                break
+        
+        if default_data_path is None:
+            st.error("Dataset file not found. Please ensure 'mpox_africa_dataset.xlsx' is in the project directory.")
+            st.info("Available files in directory:")
+            try:
+                files = os.listdir(".")
+                st.write(files)
+            except Exception as e:
+                st.write(f"Error listing files: {e}")
+            return
+
+        st.sidebar.header("Data")
+        uploaded = st.sidebar.file_uploader("Upload Excel (.xlsx) to override", type=["xlsx"], key="data_upload")
+
+        try:
+            df = _load_data_cached(default_data_path, uploaded)
+            st.success(f"Data loaded successfully! Shape: {df.shape}")
+        except FileNotFoundError:
+            st.error("Default dataset not found. Please upload an Excel file using the sidebar.")
+            return
+        except Exception as e:
+            st.exception(e)
+            st.error(f"Error loading data: {str(e)}")
+            return
+
+        date_range, countries, clades, notes = build_sidebar(df)
+        filtered = filter_data(df, date_range, countries, clades, notes)
+        context_note = make_filter_note(date_range, countries, clades, notes)
+
+        st.success(f"Data filtered successfully! Filtered shape: {filtered.shape}")
+
+        tabs = st.tabs(["Findings", "Geography", "Vaccination", "Workforce", "Deep Dives", "Insights", "Recommendations"])
+        with tabs[0]:
+            findings_tab(filtered, context_note)
+        with tabs[1]:
+            geography_tab(filtered, context_note)
+        with tabs[2]:
+            vaccination_tab(filtered, context_note)
+        with tabs[3]:
+            workforce_tab(filtered, context_note)
+        with tabs[4]:
+            deep_dives_tab(filtered, context_note)
+        with tabs[5]:
+            insights_tab(filtered)
+        with tabs[6]:
+            recommendations_tab(filtered, context_note)
+
+        st.markdown("---")
+        with st.expander("Data preview"):
+            st.dataframe(filtered.head(200))
+            st.download_button("Download filtered CSV", data=filtered.to_csv(index=False).encode("utf-8"), file_name="filtered_data.csv", mime="text/csv")
+    
     except Exception as e:
+        st.error(f"An error occurred while running the dashboard: {str(e)}")
         st.exception(e)
-        return
-
-    date_range, countries, clades, notes = build_sidebar(df)
-    filtered = filter_data(df, date_range, countries, clades, notes)
-    context_note = make_filter_note(date_range, countries, clades, notes)
-
-    tabs = st.tabs(["Findings", "Geography", "Vaccination", "Workforce", "Deep Dives", "Insights", "Recommendations"])
-    with tabs[0]:
-        findings_tab(filtered, context_note)
-    with tabs[1]:
-        geography_tab(filtered, context_note)
-    with tabs[2]:
-        vaccination_tab(filtered, context_note)
-    with tabs[3]:
-        workforce_tab(filtered, context_note)
-    with tabs[4]:
-        deep_dives_tab(filtered, context_note)
-    with tabs[5]:
-        insights_tab(filtered)
-    with tabs[6]:
-        recommendations_tab(filtered, context_note)
-
-    st.markdown("---")
-    with st.expander("Data preview"):
-        st.dataframe(filtered.head(200))
-        st.download_button("Download filtered CSV", data=filtered.to_csv(index=False).encode("utf-8"), file_name="filtered_data.csv", mime="text/csv")
+        st.info("Please check the logs for more details or try refreshing the page.")
 
 
 if __name__ == "__main__":
