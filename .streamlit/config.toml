@@ -1,0 +1,7 @@
+[theme]
+primaryColor = "#16A34A"      # health green
+backgroundColor = "#FFFFFF"   # white
+secondaryBackgroundColor = "#F3F4F6"  # light gray
+textColor = "#111827"         # near-black
+font = "sans serif"
+
