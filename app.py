@@ -89,7 +89,22 @@ def main():
     st.markdown("<h1>Mpox Africa Dashboard</h1>", unsafe_allow_html=True)
     st.caption("Interactive insights on outbreak trends, vaccination progress, surveillance, and workforce capacity.")
 
-    default_data_path = os.path.join(os.path.dirname(__file__), "mpox_africa_dataset.xlsx")
+    # Try multiple paths for deployment compatibility
+    possible_paths = [
+        "mpox_africa_dataset.xlsx",  # Current directory
+        os.path.join(os.path.dirname(__file__), "mpox_africa_dataset.xlsx"),  # Script directory
+        os.path.join(os.getcwd(), "mpox_africa_dataset.xlsx")  # Working directory
+    ]
+    
+    default_data_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            default_data_path = path
+            break
+    
+    if default_data_path is None:
+        st.error("Dataset file not found. Please ensure 'mpox_africa_dataset.xlsx' is in the project directory.")
+        return
 
     st.sidebar.header("Data")
     uploaded = st.sidebar.file_uploader("Upload Excel (.xlsx) to override", type=["xlsx"], key="data_upload")
